@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: fluentd-agent
+  labels:
+    tier: logging
+    app: fluentd-agent
+    version: v1
+spec:
+  template:
+    metadata:
+      labels:
+        name: fluentd
+    spec:
+      # Filter to specific nodes:
+      # nodeSelector:
+      #  app: newrelic
+      containers:
+        - name: fluentd
+          image: gcr.io/google_containers/fluentd-elasticsearch:1.15
+          volumeMounts:
+            - name: containers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+            - name: log
+              mountPath: /var/log
+      volumes:
+        - name: containers
+          hostPath:
+              path: /var/lib/docker/containers
+        - name: log
+          hostPath:
+              path: /var/log
